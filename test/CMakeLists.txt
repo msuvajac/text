@@ -65,7 +65,7 @@ macro(add_test_executable name group)
         )
     endif ()
     if (NOT MSVC AND NOT LIMIT_TESTING_FOR_CI) # Boost auto-linking handles this with MSVC.
-        target_link_libraries(${local_name} boost_system boost_filesystem)
+        target_link_libraries(${local_name} boost_system boost_filesystem boost_serialization)
     endif ()
     if (MSVC)
         target_compile_options(${local_name} PRIVATE /source-charset:utf-8)

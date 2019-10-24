@@ -195,7 +195,6 @@ namespace boost { namespace text { inline namespace v1 { namespace detail {
             return !(lhs == rhs);
         }
 
-    private:
         uint16_t first_;
         uint16_t last_;
         unsigned char lead_primary_ = 0;

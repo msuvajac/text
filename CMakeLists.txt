@@ -50,7 +50,7 @@ endif ()
 ##################################################
 # Dependencies
 ##################################################
-set(boost_components)
+set(boost_components serialization)
 
 # Built conditionally, because it relies on curses, Boost.System, and
 # Boost.Filesystem.  The Boost dependencies mean it must come before the
@@ -79,6 +79,7 @@ add_library(text
     src/collation_data_2.cpp
     src/case_mapping.cpp
     src/data_versions.cpp
+    src/save_load_table.cpp
 )
 
 target_include_directories(text PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

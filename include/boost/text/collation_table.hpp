@@ -342,7 +342,7 @@ namespace boost { namespace text { inline namespace v1 {
         template<typename CharIter>
         friend read_table_result<CharIter> read_table(CharIter it);
 
-        friend void save_table(
+        friend bool save_table(
             collation_table const & table, filesystem::path const & path);
         friend collation_table load_table(filesystem::path const & path);
 
