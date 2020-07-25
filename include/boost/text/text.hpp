@@ -935,8 +935,14 @@ namespace boost { namespace text {
         }
 
         return {
-            iterator(begin().base(), lo_grapheme_it, end().base()),
-            iterator(begin().base(), hi_grapheme_it, end().base())};
+            make_iter(
+                begin().base().base(),
+                lo_grapheme_it.base(),
+                end().base().base()),
+            make_iter(
+                begin().base().base(),
+                hi_grapheme_it.base(),
+                end().base().base())};
     }
 
     template<typename CharIter>

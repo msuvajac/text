@@ -8,6 +8,7 @@
 
 #include <boost/text/grapheme.hpp>
 #include <boost/text/grapheme_iterator.hpp>
+#include <boost/text/normalize_fwd.hpp>
 #include <boost/text/unencoded_rope.hpp>
 #include <boost/text/transcode_iterator.hpp>
 
@@ -35,6 +36,8 @@ namespace boost { namespace text {
         struct const_rope_iterator;
     }
 
+    template<typename Iter>
+    struct replace_result;
     struct text;
     struct rope_view;
 
@@ -181,24 +184,28 @@ namespace boost { namespace text {
 
         /** Inserts the sequence of char from c_str into *this starting at
             position at. */
-        const_iterator insert(const_iterator at, char const * c_str);
+        replace_result<const_iterator>
+        insert(const_iterator at, char const * c_str);
 
 #if defined(__cpp_char8_t)
         /** Inserts the sequence of char from c_str into *this starting at
             position at. */
-        const_iterator insert(const_iterator at, char8_t const * c_str);
+        replace_result<const_iterator>
+        insert(const_iterator at, char8_t const * c_str);
 #endif
 
         /** Inserts the sequence of char from rv into *this starting at position
             at. */
-        const_iterator insert(const_iterator at, rope_view rv);
+        replace_result<const_iterator> insert(const_iterator at, rope_view rv);
 
         /** Inserts s into *this starting at position at. */
-        const_iterator insert(const_iterator at, std::string && s);
+        replace_result<const_iterator>
+        insert(const_iterator at, std::string && s);
 
         /** Inserts the sequence of char from sv into *this starting at position
             at. */
-        const_iterator insert(const_iterator at, string_view sv);
+        replace_result<const_iterator>
+        insert(const_iterator at, string_view sv);
 
 #ifdef BOOST_TEXT_DOXYGEN
 
@@ -207,7 +214,8 @@ namespace boost { namespace text {
             This function only participates in overload resolution if
             `CharRange` models the CharRange concept. */
         template<typename CharRange>
-        const_iterator insert(const_iterator at, CharRange const & r);
+        replace_result<const_iterator>
+        insert(const_iterator at, CharRange const & r);
 
         /** Inserts the char sequence [first, last) into *this starting at
             position at.
@@ -215,42 +223,47 @@ namespace boost { namespace text {
             This function only participates in overload resolution if
             `CharIter` models the CharIter concept. */
         template<typename CharIter, typename Sentinel>
-        const_iterator insert(const_iterator at, CharIter first, Sentinel last);
+        replace_result<const_iterator>
+        insert(const_iterator at, CharIter first, Sentinel last);
 
 #else
 
         template<typename CharRange>
         auto insert(const_iterator at, CharRange const & r)
-            -> detail::rng_alg_ret_t<const_iterator, CharRange>;
+            -> detail::rng_alg_ret_t<replace_result<const_iterator>, CharRange>;
 
         template<typename CharIter, typename Sentinel>
         auto insert(const_iterator at, CharIter first, Sentinel last)
-            -> detail::char_iter_ret_t<const_iterator, CharIter>;
+            -> detail::
+                char_iter_ret_t<replace_result<const_iterator>, CharIter>;
 
 #endif
 
         /** Inserts the sequence [first, last) into *this starting at position
             at. */
-        const_iterator
+        replace_result<const_iterator>
         insert(const_iterator at, const_iterator first, const_iterator last);
 
         /** Inserts the grapheme g into *this at position at. */
-        const_iterator insert(const_iterator at, grapheme const & g);
+        replace_result<const_iterator>
+        insert(const_iterator at, grapheme const & g);
 
         /** Inserts the grapheme g into *this at position at. */
         template<typename CPIter>
-        const_iterator insert(const_iterator at, grapheme_ref<CPIter> g);
+        replace_result<const_iterator>
+        insert(const_iterator at, grapheme_ref<CPIter> g);
 
         /** Erases the portion of *this delimited by rv.
 
             \pre !std::less(rv.begin().base().base(), begin().base().base()) &&
             !std::less(end().base().base(), rv.end().base().base()) */
-        rope & erase(rope_view rv);
+        replace_result<const_iterator> erase(rope_view rv);
 
         /** Erases the portion of *this delimited by [first, last).
 
             \pre first <= last */
-        const_iterator erase(const_iterator first, const_iterator last);
+        replace_result<const_iterator>
+        erase(const_iterator first, const_iterator last);
 
         /** Replaces the portion of *this delimited by old_substr with the
             sequence of char from new_substr.
@@ -258,7 +271,8 @@ namespace boost { namespace text {
             \pre !std::less(old_substr.begin().base().base(),
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
-        rope & replace(rope_view old_substr, rope_view new_substr);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, rope_view new_substr);
 
         /** Replaves the  portion of *this delimited by old_substr with the
             sequence of char from new_substr.
@@ -266,7 +280,8 @@ namespace boost { namespace text {
             \pre !std::less(old_substr.begin().base().base(),
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
-        rope & replace(rope_view old_substr, string_view new_substr);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, string_view new_substr);
 
 #ifdef BOOST_TEXT_DOXYGEN
 
@@ -280,7 +295,8 @@ namespace boost { namespace text {
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
         template<typename CharRange>
-        rope & replace(rope_view old_substr, CharRange const & r);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, CharRange const & r);
 
         /** Replaces the portion of *this delimited by old_substr with the
             char sequence [first, last).
@@ -292,17 +308,19 @@ namespace boost { namespace text {
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
         template<typename CharIter, typename Sentinel>
-        rope & replace(rope_view old_substr, CharIter first, Sentinel last);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, CharIter first, Sentinel last);
 
 #else
 
         template<typename CharRange>
         auto replace(rope_view old_substr, CharRange const & r)
-            -> detail::rng_alg_ret_t<rope &, CharRange>;
+            -> detail::rng_alg_ret_t<replace_result<const_iterator>, CharRange>;
 
         template<typename CharIter, typename Sentinel>
         auto replace(rope_view old_substr, CharIter first, Sentinel last)
-            -> detail::char_iter_ret_t<rope &, CharIter>;
+            -> detail::
+                char_iter_ret_t<replace_result<const_iterator>, CharIter>;
 
 #endif
 
@@ -312,7 +330,8 @@ namespace boost { namespace text {
             \pre !std::less(old_substr.begin().base().base(),
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
-        rope & replace(rope_view old_substr, char const * c_str);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, char const * c_str);
 
 #if defined(__cpp_char8_t)
         /** Replaces the portion of *this delimited by old_substr with the
@@ -321,7 +340,8 @@ namespace boost { namespace text {
             \pre !std::less(old_substr.begin().base().base(),
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
-        rope & replace(rope_view old_substr, char8_t const * c_str);
+        replace_result<const_iterator>
+        replace(rope_view old_substr, char8_t const * c_str);
 #endif
 
         /** Replaces the portion of *this delimited by old_substr with the
@@ -330,7 +350,7 @@ namespace boost { namespace text {
             \pre !std::less(old_substr.begin().base().base(),
             begin().base().base()) && !std::less(end().base().base(),
             old_substr.end().base().base()) */
-        rope & replace(
+        replace_result<const_iterator> replace(
             rope_view old_substr, const_iterator first, const_iterator last);
 
         /** Swaps *this with rhs. */
@@ -396,16 +416,22 @@ namespace boost { namespace text {
             detail::const_rope_iterator it,
             detail::const_rope_iterator last) noexcept;
 
-        using mutable_utf32_iter =
-            utf_8_to_32_iterator<detail::const_rope_iterator>;
+        using utf32_iter = utf_8_to_32_iterator<detail::const_rope_iterator>;
 
-        mutable_utf32_iter prev_stable_cp(mutable_utf32_iter last) noexcept;
-        mutable_utf32_iter next_stable_cp(mutable_utf32_iter first) noexcept;
+        replace_result<const_iterator>
+        mutation_result(std::size_t first_offset, std::size_t last_offset);
 
-        const_iterator
-        insert_impl(iterator at, std::string str, bool str_normalized);
-        const_iterator
-        replace_impl(rope_view old_substr, std::string str, bool str_normalized);
+        replace_result<const_iterator>
+        normalize_endpoints(std::size_t first_, std::size_t last_);
+
+        replace_result<const_iterator> insert_impl(
+            iterator at,
+            std::string str,
+            insertion_normalization insertion_norm);
+        replace_result<const_iterator> replace_impl(
+            rope_view old_substr,
+            std::string str,
+            insertion_normalization insertion_norm);
 
         template<typename CPIter>
         struct insert_grapheme_ref_impl;
@@ -419,56 +445,6 @@ namespace boost { namespace text {
 
 #endif // Doxygen
     };
-
-#ifndef BOOST_TEXT_DOXYGEN
-
-    template<typename CPIter>
-    struct rope::insert_grapheme_ref_impl
-    {
-        static rope::const_iterator
-        call(rope & r, rope::const_iterator at, grapheme_ref<CPIter> g)
-        {
-            if (g.empty())
-                return at;
-
-            std::string s;
-            boost::text::transcode_to_utf8(
-                g.begin(), g.end(), std::inserter(s, s.end()));
-            return r.insert_impl(at, std::move(s), true);
-        }
-    };
-
-    template<typename Sentinel, typename ErrorHandler>
-    struct rope::insert_grapheme_ref_impl<
-        utf_8_to_32_iterator<char const *, Sentinel, ErrorHandler>>
-    {
-        static rope::const_iterator call(
-            rope & r,
-            rope::const_iterator at,
-            grapheme_ref<
-                utf_8_to_32_iterator<char const *, Sentinel, ErrorHandler>> g)
-        {
-            return r.insert_impl(
-                at, std::string(g.begin().base(), g.end().base()), true);
-        }
-    };
-
-    template<typename Sentinel, typename ErrorHandler>
-    struct rope::insert_grapheme_ref_impl<
-        utf_8_to_32_iterator<char *, Sentinel, ErrorHandler>>
-    {
-        static rope::const_iterator call(
-            rope & r,
-            rope::const_iterator at,
-            grapheme_ref<utf_8_to_32_iterator<char *, Sentinel, ErrorHandler>>
-                g)
-        {
-            return r.insert_impl(
-                at, std::string(g.begin().base(), g.end().base()), true);
-        }
-    };
-
-#endif
 
     inline rope::iterator begin(rope const & t) noexcept { return t.begin(); }
     inline rope::iterator end(rope const & t) noexcept { return t.end(); }
@@ -640,148 +616,178 @@ namespace boost { namespace text {
 
     inline void rope::clear() noexcept { rope_.clear(); }
 
-    inline rope::const_iterator
+    inline replace_result<rope::const_iterator>
     rope::insert(const_iterator at, char const * c_str)
     {
-        return insert_impl(at, std::string(c_str), false);
+        return insert_impl(at, std::string(c_str), insertion_not_normalized);
     }
 
 #if defined(__cpp_char8_t)
-    inline rope::const_iterator
+    inline replace_result<rope::const_iterator>
     rope::insert(const_iterator at, char8_t const * c_str)
     {
-        return insert_impl(at, std::string((char const *)c_str), false);
+        return insert_impl(
+            at, std::string((char const *)c_str), insertion_not_normalized);
     }
 #endif
 
-    inline rope::const_iterator rope::insert(const_iterator at, rope_view rv)
+    inline replace_result<rope::const_iterator>
+    rope::insert(const_iterator at, rope_view rv)
     {
         // TODO: It would be better if we shared nodes with copied nodes from
         // rv.  Same for unencoded_rope probably.
         return insert_impl(
-            at, std::string(rv.begin().base().base(), rv.end().base().base()), true);
+            at,
+            std::string(rv.begin().base().base(), rv.end().base().base()),
+            insertion_normalized);
     }
 
-    inline rope::const_iterator rope::insert(const_iterator at, std::string && s)
+    inline replace_result<rope::const_iterator>
+    rope::insert(const_iterator at, std::string && s)
     {
-        return insert_impl(at, std::move(s), false);
+        return insert_impl(at, std::move(s), insertion_not_normalized);
     }
 
-    inline rope::const_iterator rope::insert(const_iterator at, string_view sv)
+    inline replace_result<rope::const_iterator>
+    rope::insert(const_iterator at, string_view sv)
     {
-        return insert_impl(at, std::string(sv), false);
+        return insert_impl(at, std::string(sv), insertion_not_normalized);
     }
 
     template<typename CharRange>
     auto rope::insert(const_iterator at, CharRange const & r)
-        -> detail::rng_alg_ret_t<rope::const_iterator, CharRange>
+        -> detail::rng_alg_ret_t<replace_result<const_iterator>, CharRange>
     {
         return insert_impl(
-            at, std::string(detail::make_string(r.begin(), r.end())), false);
+            at,
+            std::string(detail::make_string(r.begin(), r.end())),
+            insertion_not_normalized);
     }
 
     template<typename CharIter, typename Sentinel>
     auto rope::insert(const_iterator at, CharIter first, Sentinel last)
-        -> detail::char_iter_ret_t<rope::const_iterator, CharIter>
+        -> detail::char_iter_ret_t<replace_result<const_iterator>, CharIter>
     {
-        return insert_impl(at, detail::make_string(first, last), false);
+        return insert_impl(
+            at, detail::make_string(first, last), insertion_not_normalized);
     }
 
-    inline rope::const_iterator
+    inline replace_result<rope::const_iterator>
     rope::insert(const_iterator at, const_iterator first, const_iterator last)
     {
         return insert(at, rope_view(first, last));
     }
 
-    inline rope::const_iterator
+    inline replace_result<rope::const_iterator>
     rope::insert(const_iterator at, grapheme const & g)
     {
         return insert(at, grapheme_ref<grapheme::const_iterator>(g));
     }
 
     template<typename CPIter>
-    rope::const_iterator rope::insert(const_iterator at, grapheme_ref<CPIter> g)
+    replace_result<rope::const_iterator>
+    rope::insert(const_iterator at, grapheme_ref<CPIter> g)
     {
         return insert_grapheme_ref_impl<CPIter>::call(*this, at, g);
     }
 
-    inline rope & rope::erase(rope_view rv)
+    inline replace_result<rope::const_iterator> rope::erase(rope_view rv)
     {
+        using view = detail::stable_cps_result_t<utf32_iter>;
+
         rope_view const this_rv(*this);
-        auto const this_rv_first = this_rv.begin().base().base();
-        auto const this_rv_last = this_rv.end().base().base();
 
-        auto const rv_first = rv.begin().base().base();
-        auto const rv_last = rv.end().base().base();
+        auto first_offset =
+            rv.begin().base().base() - this_rv.begin().base().base();
+        auto last_offset =
+            rv.end().base().base() - this_rv.begin().base().base();
+        rope_.erase(rope_.begin() + first_offset, rope_.begin() + last_offset);
 
-        using mutable_utf32_view_iter =
-            utf_8_to_32_iterator<detail::const_rope_view_iterator>;
+        utf32_iter const at(
+            rope_.begin(), rope_.begin() + first_offset, rope_.end());
+        view const unstable{
+            detail::last_stable_cp<nf::fcc>(begin().base(), at),
+            detail::first_stable_cp<nf::fcc>(at, end().base())};
+        std::string normalized;
+        boost::text::normalize_append<nf::fcc>(unstable, normalized);
 
-        mutable_utf32_view_iter first(this_rv_first, rv_first, this_rv_last);
-        first = boost::text::find_if_backward(
-            mutable_utf32_view_iter(this_rv_first, this_rv_first, this_rv_last),
-            first,
-            detail::stable_code_point<nf::fcc>);
-        mutable_utf32_view_iter last(this_rv_first, rv_last, this_rv_last);
+        view const unstable_before_at{unstable.begin(), at};
+        view const unstable_after_at{at, unstable.end()};
 
-        last = boost::text::find_if(
-            last,
-            mutable_utf32_view_iter(this_rv_last, this_rv_last, this_rv_last),
-            detail::stable_code_point<nf::fcc>);
+        auto const normalized_cps = boost::text::as_utf32(normalized);
 
-        std::string str(first.base(), rv_first);
-        str.insert(str.end(), rv_last, last.base());
+        auto const prefix_mismatch = std::mismatch(
+            unstable_before_at.begin(),
+            unstable_before_at.end(),
+            normalized_cps.begin(),
+            normalized_cps.end());
+        auto const after_at_last =
+            std::make_reverse_iterator(unstable_after_at.begin());
+        auto const suffix_mismatch = std::mismatch(
+            std::make_reverse_iterator(unstable_after_at.end()),
+            after_at_last,
+            std::make_reverse_iterator(normalized_cps.end()),
+            std::make_reverse_iterator(normalized_cps.begin()));
 
+        if (prefix_mismatch.first == unstable_before_at.end() &&
+            suffix_mismatch.first != after_at_last) {
+            return mutation_result(first_offset, first_offset);
+        }
+
+        last_offset = first_offset + (suffix_mismatch.first.base().base() -
+                                      unstable_after_at.begin().base());
+        first_offset -=
+            unstable_before_at.end().base() - prefix_mismatch.first.base();
         rope_.replace(
-            rope_(first.base() - this_rv_first, last.base() - this_rv_first),
-            std::move(str));
+            unencoded_rope_view(
+                rope_,
+                unstable.begin().base() - rope_.begin(),
+                unstable.end().base() - rope_.begin()),
+            std::move(normalized));
 
-        BOOST_TEXT_CHECK_ROPE_NORMALIZATION();
-
-        return *this;
+        return mutation_result(first_offset, last_offset);
     }
 
-    inline rope::const_iterator
+    inline replace_result<rope::const_iterator>
     rope::erase(const_iterator first, const_iterator last)
     {
-        int const offset = first.base().base() - rope_.begin();
-        erase(rope_view(first, last));
-        return make_iter(rope_.begin(), rope_.begin() + offset, rope_.end());
+        return erase(rope_view(first, last));
     }
 
-    inline rope & rope::replace(rope_view old_substr, rope_view new_substr)
+    inline replace_result<rope::const_iterator>
+    rope::replace(rope_view old_substr, rope_view new_substr)
     {
-        replace_impl(
+        return replace_impl(
             old_substr,
             std::string(
                 new_substr.begin().base().base(),
                 new_substr.end().base().base()),
-            true);
-        return *this;
+            insertion_normalized);
     }
 
-    inline rope & rope::replace(rope_view old_substr, string_view new_substr)
+    inline replace_result<rope::const_iterator>
+    rope::replace(rope_view old_substr, string_view new_substr)
     {
-        replace_impl(old_substr, std::string(new_substr), false);
-        return *this;
+        return replace_impl(
+            old_substr, std::string(new_substr), insertion_not_normalized);
     }
 
     template<typename CharRange>
-    auto rope::replace(rope_view old_substr, CharRange const & r)
-        -> detail::rng_alg_ret_t<rope &, CharRange>
+    auto rope::replace(rope_view old_substr, CharRange const & r) -> detail::
+        rng_alg_ret_t<replace_result<rope::const_iterator>, CharRange>
     {
-        replace(old_substr, std::begin(r), std::end(r));
-        return *this;
+        return replace(old_substr, std::begin(r), std::end(r));
     }
 
-    inline rope & rope::replace(rope_view old_substr, char const * str)
+    inline replace_result<rope::const_iterator>
+    rope::replace(rope_view old_substr, char const * str)
     {
-        replace(old_substr, string_view(str));
-        return *this;
+        return replace(old_substr, string_view(str));
     }
 
 #if defined(__cpp_char8_t)
-    inline rope & rope::replace(rope_view old_substr, char8_t const * str)
+    inline replace_result<rope::const_iterator>
+    rope::replace(rope_view old_substr, char8_t const * str)
     {
         return replace(old_substr, (char const *)str);
     }
@@ -789,13 +795,16 @@ namespace boost { namespace text {
 
     template<typename CharIter, typename Sentinel>
     auto rope::replace(rope_view old_substr, CharIter first, Sentinel last)
-        -> detail::char_iter_ret_t<rope &, CharIter>
+        -> detail::
+            char_iter_ret_t<replace_result<rope::const_iterator>, CharIter>
     {
-        replace_impl(old_substr, detail::make_string(first, last), false);
-        return *this;
+        return replace_impl(
+            old_substr,
+            detail::make_string(first, last),
+            insertion_not_normalized);
     }
 
-    inline rope & rope::replace(
+    inline replace_result<rope::const_iterator> rope::replace(
         rope_view old_substr, const_iterator first, const_iterator last)
     {
         return replace(old_substr, rope_view(first, last));
@@ -858,128 +867,204 @@ namespace boost { namespace text {
                 first, last, last}};
     }
 
-    inline rope::mutable_utf32_iter
-    rope::prev_stable_cp(mutable_utf32_iter last) noexcept
+    inline replace_result<rope::const_iterator>
+    rope::mutation_result(std::size_t first_offset, std::size_t last_offset)
     {
-        auto const first =
-            mutable_utf32_iter(rope_.begin(), rope_.begin(), rope_.end());
-        auto const it = boost::text::find_if_backward(
-            first, last, detail::stable_code_point<nf::fcc>);
-        if (it == last)
-            return first;
-        return it;
-    }
+        auto const rope_first = rope_.begin();
+        auto const rope_lo = rope_first + first_offset;
+        auto const rope_hi = rope_first + last_offset;
+        auto const rope_last = rope_.end();
 
-    inline rope::mutable_utf32_iter
-    rope::next_stable_cp(mutable_utf32_iter first) noexcept
-    {
-        auto const last =
-            mutable_utf32_iter(rope_.begin(), rope_.end(), rope_.end());
-        auto const it = boost::text::find_if(
-            first, last, detail::stable_code_point<nf::fcc>);
-        return it;
-    }
+        // The insertion that just happened might be merged into the CP or
+        // grapheme ending at the offset of the inserted char(s); if so, back
+        // up and return an iterator to that.
+        auto lo_cp_it = utf32_iter(rope_first, rope_lo, rope_last);
+        auto const lo_grapheme_it = boost::text::prev_grapheme_break(
+            begin().base(), lo_cp_it, end().base());
 
-    inline rope::const_iterator
-    rope::insert_impl(const_iterator at, std::string str, bool str_normalized)
-    {
-        bool const str_null_terminated = !str.empty() && str.back() == '\0';
-        if (str_null_terminated)
-            str.resize(str.size() - 1);
-        return replace_impl(rope_view(at, at), std::move(str), str_normalized);
-    }
-
-    inline rope::const_iterator
-    rope::replace_impl(rope_view old_substr, std::string str, bool str_normalized)
-    {
-        rope_view const this_rv(*this);
-
-        bool const str_null_terminated = !str.empty() && str.back() == '\0';
-        if (str_null_terminated)
-            str.resize(str.size() - 1);
-
-        auto const lo =
-            old_substr.begin().base().base() - this_rv.begin().base().base();
-        auto const hi =
-            old_substr.end().base().base() - this_rv.begin().base().base();
-        auto const rope_first = rope_.begin() + lo;
-        auto const rope_last = rope_.begin() + hi;
-
-        mutable_utf32_iter first(rope_.begin(), rope_first, rope_.end());
-        first = prev_stable_cp(first);
-        mutable_utf32_iter last(rope_.begin(), rope_last, rope_.end());
-        last = next_stable_cp(last);
-
-        str.insert(str.begin(), first.base(), rope_first);
-        auto const initial_str_end_offset = str.size();
-        str.insert(str.end(), rope_last, last.base());
-
-        if (str_normalized) {
-            using utf32_string_iter =
-                utf_8_to_32_iterator<std::string::const_iterator>;
-
-            if (last.base() != rope_last) {
-                auto const str_first = str.begin() + initial_str_end_offset;
-                auto const str_last =
-                    boost::text::find_if_backward(
-                        utf32_string_iter(str.begin(), str.begin(), str.end()),
-                        utf32_string_iter(str.begin(), str_first, str.end()),
-                        detail::stable_code_point<nf::fcc>)
-                        .base();
-                auto const suffix =
-                    detail::substring(str, 0, str_last - str.begin());
-                container::small_vector<char, 256> buf;
-                boost::text::normalize<nf::fcc>(
-                    boost::text::as_utf32(suffix.begin(), suffix.end()),
-                    boost::text::from_utf32_back_inserter(buf));
-                str.replace(str.cbegin(), str_last, buf.begin(), buf.end());
-            }
-
-            if (first.base() != rope_first) {
-                auto const str_first =
-                    str.begin() + (rope_first - first.base());
-                auto const str_last =
-                    find_if(
-                        utf32_string_iter(str.begin(), str_first, str.end()),
-                        utf32_string_iter(str.begin(), str.end(), str.end()),
-                        detail::stable_code_point<nf::fcc>)
-                        .base();
-                auto const prefix =
-                    detail::substring(str, 0, str_last - str.begin());
-                container::small_vector<char, 256> buf;
-                boost::text::normalize<nf::fcc>(
-                    boost::text::as_utf32(prefix.begin(), prefix.end()),
-                    boost::text::from_utf32_back_inserter(buf));
-                str.replace(str.cbegin(), str_last, buf.begin(), buf.end());
-            }
-        } else {
-            boost::text::normalize<nf::fcc>(str);
+        // The insertion that just happened might be merged into the CP or
+        // grapheme starting at the offset of the inserted char(s); if so,
+        // move up and return an iterator to that.
+        auto hi_cp_it = utf32_iter(rope_first, rope_hi, rope_last);
+        auto hi_grapheme_it = hi_cp_it;
+        if (!boost::text::at_grapheme_break(
+                begin().base(), hi_cp_it, end().base())) {
+            hi_grapheme_it =
+                boost::text::next_grapheme_break(hi_cp_it, end().base());
         }
 
-        auto const prev_initial_cp =
-            first == last ? boost::text::replacement_character() : *first;
-        auto const initial_cp = str.empty()
-                                    ? boost::text::replacement_character()
-                                    : *boost::text::utf32_iterator(
-                                          str.begin(), str.begin(), str.end());
-        auto const new_lo =
-            initial_cp == prev_initial_cp ? lo : first.base() - rope_.begin();
-
-        rope_.replace(
-            rope_(first.base() - rope_.begin(), last.base() - rope_.begin()),
-            std::move(str));
-
-        BOOST_TEXT_CHECK_ROPE_NORMALIZATION();
-
-        auto insertion_cp_it = mutable_utf32_iter(
-            rope_.begin(), rope_.begin() + new_lo, rope_.end());
-        auto const first_cp_of_grapheme_it =
-            boost::text::prev_grapheme_break(
-                begin().base(), insertion_cp_it, end().base());
-
-        return make_iter(
-            rope_.begin(), first_cp_of_grapheme_it.base(), rope_.end());
+        return {
+            make_iter(
+                begin().base().base(),
+                lo_grapheme_it.base(),
+                end().base().base()),
+            make_iter(
+                begin().base().base(),
+                hi_grapheme_it.base(),
+                end().base().base())};
     }
+
+    inline replace_result<rope::const_iterator>
+    rope::normalize_endpoints(std::size_t first_offset, std::size_t last_offset)
+    {
+        using view = detail::stable_cps_result_t<utf32_iter>;
+
+        std::string normalized;
+
+        {
+            utf32_iter const first(
+                rope_.begin(), rope_.begin() + first_offset, rope_.end());
+            utf32_iter const last(
+                rope_.begin(), rope_.begin() + last_offset, rope_.end());
+            view const unstable{
+                detail::last_stable_cp<nf::fcc>(begin().base(), first),
+                detail::first_stable_cp<nf::fcc>(first, last)};
+            boost::text::normalize_append<nf::fcc>(unstable, normalized);
+
+            auto const normalized_cps = boost::text::as_utf32(normalized);
+
+            view const unstable_before_insertion{unstable.begin(), first};
+            auto const mismatch = std::mismatch(
+                unstable_before_insertion.begin(),
+                unstable_before_insertion.end(),
+                normalized_cps.begin(),
+                normalized_cps.end());
+            if (mismatch.first != unstable_before_insertion.end()) {
+                first_offset -= unstable_before_insertion.end().base() -
+                                mismatch.first.base();
+                rope_.replace(
+                    unencoded_rope_view(
+                        rope_,
+                        unstable.begin().base() - rope_.begin(),
+                        unstable.end().base() - rope_.begin()),
+                    std::move(normalized));
+            }
+        }
+
+        normalized.clear();
+
+        {
+            utf32_iter const first(
+                rope_.begin(), rope_.begin() + first_offset, rope_.end());
+            utf32_iter const last(
+                rope_.begin(), rope_.begin() + last_offset, rope_.end());
+            view const unstable{
+                detail::last_stable_cp<nf::fcc>(first, last),
+                detail::first_stable_cp<nf::fcc>(last, end().base())};
+            boost::text::normalize_append<nf::fcc>(unstable, normalized);
+
+            auto const normalized_cps = boost::text::as_utf32(normalized);
+
+            view const unstable_after_insertion{last, unstable.end()};
+            auto const after_insertion_last =
+                std::make_reverse_iterator(unstable_after_insertion.begin());
+            auto const mismatch = std::mismatch(
+                std::make_reverse_iterator(unstable_after_insertion.end()),
+                after_insertion_last,
+                std::make_reverse_iterator(normalized_cps.end()),
+                std::make_reverse_iterator(normalized_cps.begin()));
+            if (mismatch.first != after_insertion_last) {
+                last_offset += mismatch.first.base().base() -
+                               unstable_after_insertion.begin().base();
+                rope_.replace(
+                    unencoded_rope_view(
+                        rope_,
+                        unstable.begin().base() - rope_.begin(),
+                        unstable.end().base() - rope_.begin()),
+                    std::move(normalized));
+            }
+        }
+
+        return mutation_result(first_offset, last_offset);
+    }
+
+    inline replace_result<rope::const_iterator> rope::insert_impl(
+        iterator at, std::string str, insertion_normalization insertion_norm)
+    {
+        if (insertion_norm != insertion_normalized)
+            boost::text::normalize<nf::fcc>(str);
+
+        auto const rope_at = at.base().base();
+        auto const at_offset = rope_at - rope_.begin();
+
+        auto const insertion_size = str.size();
+        rope_.insert(rope_at, std::move(str));
+
+        return normalize_endpoints(at_offset, at_offset + insertion_size);
+    }
+
+    replace_result<rope::const_iterator> rope::replace_impl(
+        rope_view old_substr,
+        std::string str,
+        insertion_normalization insertion_norm)
+    {
+        if (insertion_norm != insertion_normalized)
+            boost::text::normalize<nf::fcc>(str);
+
+        rope_view const this_rv(*this);
+        unencoded_rope_view const this_urv(rope_);
+        unencoded_rope_view const replaced(
+            rope_,
+            old_substr.begin().base().base() - this_rv.begin().base().base(),
+            old_substr.end().base().base() - this_rv.begin().base().base());
+        auto const replacement_offset = replaced.begin() - this_urv.begin();
+
+        auto const insertion_size = str.size();
+        rope_.replace(replaced, std::move(str));
+
+        return normalize_endpoints(
+            replacement_offset, replacement_offset + insertion_size);
+    }
+
+    template<typename CPIter>
+    struct rope::insert_grapheme_ref_impl
+    {
+        static auto
+        call(rope & r, rope::const_iterator at, grapheme_ref<CPIter> g)
+        {
+            if (g.empty())
+                return replace_result<const_iterator>{at, at};
+
+            std::string s;
+            boost::text::transcode_to_utf8(
+                g.begin(), g.end(), std::inserter(s, s.end()));
+            return r.insert_impl(at, std::move(s), insertion_normalized);
+        }
+    };
+
+    template<typename Sentinel, typename ErrorHandler>
+    struct rope::insert_grapheme_ref_impl<
+        utf_8_to_32_iterator<char const *, Sentinel, ErrorHandler>>
+    {
+        static auto call(
+            rope & r,
+            rope::const_iterator at,
+            grapheme_ref<
+                utf_8_to_32_iterator<char const *, Sentinel, ErrorHandler>> g)
+        {
+            return r.insert_impl(
+                at,
+                std::string(g.begin().base(), g.end().base()),
+                insertion_normalized);
+        }
+    };
+
+    template<typename Sentinel, typename ErrorHandler>
+    struct rope::insert_grapheme_ref_impl<
+        utf_8_to_32_iterator<char *, Sentinel, ErrorHandler>>
+    {
+        static auto call(
+            rope & r,
+            rope::const_iterator at,
+            grapheme_ref<utf_8_to_32_iterator<char *, Sentinel, ErrorHandler>>
+                g)
+        {
+            return r.insert_impl(
+                at,
+                std::string(g.begin().base(), g.end().base()),
+                insertion_normalized);
+        }
+    };
 
 }}
 
