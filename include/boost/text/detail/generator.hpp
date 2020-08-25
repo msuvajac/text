@@ -9,7 +9,7 @@
 
 #if BOOST_TEXT_USE_COROUTINES
 
-#include <coroutine>
+#include <experimental/coroutine>
 #include <exception>
 #include <functional>
 #include <iterator>
@@ -38,20 +38,23 @@ namespace boost::text::detail {
 
         generator<T> get_return_object() noexcept;
 
-        constexpr std::suspend_always initial_suspend() const { return {}; }
-        constexpr std::suspend_always final_suspend() const { return {}; }
+        constexpr std::experimental::suspend_always initial_suspend() const { return {}; }
+        constexpr std::experimental::suspend_always final_suspend() const
+        {
+            return {};
+        }
 
         template<
             typename U = T,
             std::enable_if_t<!std::is_rvalue_reference<U>::value, int> = 0>
-        std::suspend_always
+        std::experimental::suspend_always
         yield_value(std::remove_reference_t<T> & value) noexcept
         {
             m_value = std::addressof(value);
             return {};
         }
 
-        std::suspend_always
+        std::experimental::suspend_always
         yield_value(std::remove_reference_t<T> && value) noexcept
         {
             m_value = std::addressof(value);
@@ -69,7 +72,7 @@ namespace boost::text::detail {
 
         // Don't allow any use of 'co_await' inside the generator coroutine.
         template<typename U>
-        std::suspend_never await_transform(U && value) = delete;
+        std::experimental::suspend_never await_transform(U && value) = delete;
 
         void rethrow_if_exception()
         {
@@ -89,7 +92,7 @@ namespace boost::text::detail {
     template<typename T>
     class generator_iterator
     {
-        using coroutine_handle = std::coroutine_handle<generator_promise<T>>;
+        using coroutine_handle = std::experimental::coroutine_handle<generator_promise<T>>;
 
     public:
         using iterator_category = std::input_iterator_tag;
@@ -211,12 +214,12 @@ namespace boost::text::detail {
     private:
         friend class generator_promise<T>;
 
-        explicit generator(
-            std::coroutine_handle<promise_type> coroutine) noexcept :
+        explicit generator(std::experimental::coroutine_handle<promise_type>
+                               coroutine) noexcept :
             m_coroutine(coroutine)
         {}
 
-        std::coroutine_handle<promise_type> m_coroutine;
+        std::experimental::coroutine_handle<promise_type> m_coroutine;
     };
 
     template<typename T>
@@ -228,7 +231,7 @@ namespace boost::text::detail {
     template<typename T>
     generator<T> generator_promise<T>::get_return_object() noexcept
     {
-        using coroutine_handle = std::coroutine_handle<generator_promise<T>>;
+        using coroutine_handle = std::experimental::coroutine_handle<generator_promise<T>>;
         return generator<T>{coroutine_handle::from_promise(*this)};
     }
 
